@@ -1,4 +1,4 @@
-#include <credentials.h>
+#include <credentials.h> //to hide sensitive credentials
 #define BLYNK_PRINT Serial
 
 #define BLYNK_TEMPLATE_ID "TMPL4WP9Bigae"
@@ -16,8 +16,8 @@
 
 #include "camera_pins.h"
 
-const char *ssid = "LukoSpot";
-const char *password = "Duisbu5.";
+const char *ssid = mySSID; // values sotred in credentials.h
+const char *password = myPASSWORD ;
 
 void startCameraServer();
 void setupLedFlash(int pin);
