@@ -186,7 +186,10 @@ camera_config_t config;
 }//end of setup
 
 void loop() {
-  Blynk.run();
+Blynk.run();
+
+int pwmLeft = neutralSignal;
+int pwmRight = neutralSignal;
 
 float powerLimit = 0.3;
 
@@ -206,12 +209,12 @@ if (abs(offsetSteering) >= 300) {
 }
 
 // Apply power limit
-float pwmLeft = neutralSignal + (throttleCmd + steerCmd) * powerLimit;
-float pwmRight = neutralSignal + (throttleCmd - steerCmd) * powerLimit;
+pwmLeft = neutralSignal + (throttleCmd + steerCmd) * powerLimit;
+pwmRight = neutralSignal + (throttleCmd - steerCmd) * powerLimit;
 
-// Safety limit
-pwmLeft = constrain(pwmLeft, 0, 180);
-pwmRight = constrain(pwmRight, 0, 180);
+// // Safety limit
+// pwmLeft = constrain(pwmLeft, 0, 180);
+// pwmRight = constrain(pwmRight, 0, 180);
 
 // Apply
 esc1.write(pwmLeft);
