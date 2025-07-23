@@ -27,10 +27,10 @@ int MOTOR_CALIBRATION_DELAY = 5000;
 // #define JOYSTICK_MOVE_PIN 34
 // #define JOYSTICK_STEER_PIN 35
 
-int joystick_move_pos, joystick_steer_pos, flash, pic;
+int sliderValue, joystick_steer_pos, flash, pic;
 
 BLYNK_WRITE(V0) {
-  joystick_move_pos  = param.asInt();
+  sliderValue  = param.asInt();
 }
 
 BLYNK_WRITE(V1) {
@@ -49,6 +49,9 @@ BLYNK_WRITE(V3) {
 #define ESC2_PIN 13
 Servo esc1;
 Servo esc2;
+
+const int neutralSignal = 90; // Typically 90 is stop for bidirectional ESCs
+const int signalRange = 90;   // 0–180 degrees = full range
 
 void setup() {
   Serial.begin(115200);
@@ -182,24 +185,45 @@ void setup() {
 void loop() {
   Blynk.run();
 
-  int motorF = 2000;
-  int motorB = 2000;
+  int pwmLeft, pwmRight;
 
-  // Control esc1 based on joystick_move_pos
-  if (joystick_move_pos > 3000) {
-    motorF = map(joystick_move_pos, 2500, 4095, 0, 180); // Adjust mapping range
-    esc1.write(motorF);
+  int offsetL = sliderValue - 2048;
+  // Map offset range (-512 to +511) to ESC signal range (0–180)
+  if (abs(offsetL) < 200) {
+    pwmLeft = neutralSignal; // Deadzone
   } else {
-    esc1.write(0); // Stop ESC1 when joystick is pushed upwards
+    pwmLeft = map(offsetL,-2048, 2048, 0, 180);
   }
 
-  // Control esc2 based on joystick_steer_pos
-  if (joystick_move_pos < 1000) {
-    motorB = map(joystick_move_pos, 1500, 0, 0, 180); // Adjust mapping range
-    esc2.write(motorB);
+  int offsetR = joystick_steer_pos - 2048;
+  if (abs(offsetR) < 200) {
+    pwmRight = neutralSignal; // Deadzone
   } else {
-    esc2.write(0); // Stop ESC2 when joystick is not pushed down
+    pwmRight = map(offsetR,-2048, 2048, 0, 180);
   }
+
+  esc1.write(pwmLeft);
+  esc2.write(pwmRight);
+  // int motorF = 2000;
+  // int motorB = 2000;
+
+  // // Control esc1 based on joystick_move_pos
+  // if (joystick_move_pos > 3000) {
+  //   motorF = map(joystick_move_pos, 2500, 4095, 0, 180); // Adjust mapping range
+  //   esc1.write(motorF);
+  // } else {
+  //   esc1.write(0); // Stop ESC1 when joystick is pushed upwards
+  // }
+
+  // // Control esc2 based on joystick_steer_pos
+  // if (joystick_move_pos < 1000) {
+  //   motorB = map(joystick_move_pos, 1500, 0, 0, 180); // Adjust mapping range
+  //   esc2.write(motorB);
+  // } else {
+  //   esc2.write(0); // Stop ESC2 when joystick is not pushed down
+  // }
+
+
 
   digitalWrite(4, flash == 1 ? HIGH : LOW);
 
