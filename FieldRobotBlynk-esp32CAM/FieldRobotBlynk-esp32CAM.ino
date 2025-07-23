@@ -187,7 +187,34 @@ void loop() {
 
 
 
-  
+  int pwmLeft, pwmRight;
+float powerLimit = 0.3;
+
+int offsetThrottle = sliderValue - 2048;  // forward/backward
+int offsetSteering = joystick_steer_pos - 2048;  // left/right
+
+int throttle = 0;
+int steer = 0;
+
+if (abs(offsetThrottle) >= 400) {
+  throttle = map(offsetThrottle, -2048, 2048, -90, 90) * powerLimit;
+}
+
+if (abs(offsetSteering) >= 400) {
+  steer = map(offsetSteering, -2048, 2048, -90, 90) * powerLimit;
+}
+
+// Combine throttle and steer to get left/right ESC signals
+pwmLeft  = neutralSignal + throttle + steer;
+pwmRight = neutralSignal + throttle - steer;
+
+// Clamp output to [0, 180] for safety
+pwmLeft  = constrain(pwmLeft, 0, 180);
+pwmRight = constrain(pwmRight, 0, 180);
+
+esc1.write(pwmLeft);
+esc2.write(pwmRight);
+
   // int pwmLeft, pwmRight;
   // float powerLimit = 0.3; // 30% of full power (change to anything from 0.0 to 1.0)
 
