@@ -197,11 +197,11 @@ int offsetSteering = joystick_steer_pos - 2048;
 int throttleCmd = 0;
 int steerCmd = 0;
 
-if (abs(offsetThrottle) >= 400) {
+if (abs(offsetThrottle) >= 300) {
   throttleCmd = map(offsetThrottle, -2048, 2048, -90, 90);
 }
 
-if (abs(offsetSteering) >= 400) {
+if (abs(offsetSteering) >= 300) {
   steerCmd = map(offsetSteering, -2048, 2048, -90, 90);
 }
 
@@ -294,15 +294,24 @@ void setupMotors() {
 }
 
 void calibrateMotors() {
-  Serial.println("Setting maximum throttle...");
-  esc1.writeMicroseconds(2000);
-  esc2.writeMicroseconds(2000);
-  delay(MOTOR_CALIBRATION_DELAY);
+  // Serial.println("Setting maximum throttle...");
+  // esc1.writeMicroseconds(2000);
+  // esc2.writeMicroseconds(2000);
+  // delay(MOTOR_CALIBRATION_DELAY);
 
-  Serial.println("Setting minimum throttle...");
-  esc1.writeMicroseconds(500);
-  esc2.writeMicroseconds(500);
-  delay(MOTOR_CALIBRATION_DELAY);
+  // Serial.println("Setting minimum throttle...");
+  // esc1.writeMicroseconds(500);
+  // esc2.writeMicroseconds(500);
+  // delay(MOTOR_CALIBRATION_DELAY);
+
+  //alternate calibration
+  esc1.writeMicroseconds(2000); // max signal
+  delay(2000);
+  esc1.writeMicroseconds(1000); // min signal
+  delay(2000);
+  esc1.writeMicroseconds(1500); // neutral
+  delay(1000);
+
 }
 
 void camStuff(){
