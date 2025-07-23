@@ -188,37 +188,29 @@ camera_config_t config;
 void loop() {
 Blynk.run();
 
-int pwmLeft = neutralSignal;
-int pwmRight = neutralSignal;
-
 float powerLimit = 0.3;
-
 int offsetThrottle = sliderValue - 2048;
 int offsetSteering = joystick_steer_pos - 2048;
 
-// Normalize throttle and steer to a range of -90 to 90
 int throttleCmd = 0;
 int steerCmd = 0;
 
-if (abs(offsetThrottle) >= 300) {
+if (abs(offsetThrottle) > 400) {
   throttleCmd = map(offsetThrottle, -2048, 2048, -90, 90);
 }
-
-if (abs(offsetSteering) >= 300) {
+if (abs(offsetSteering) > 400) {
   steerCmd = map(offsetSteering, -2048, 2048, -90, 90);
 }
 
-// Apply power limit
-pwmLeft = neutralSignal + (throttleCmd + steerCmd) * powerLimit;
-pwmRight = neutralSignal + (throttleCmd - steerCmd) * powerLimit;
+float pwmLeft  = neutralSignal + (float)(throttleCmd + steerCmd) * powerLimit;
+float pwmRight = neutralSignal + (float)(throttleCmd - steerCmd) * powerLimit;
 
-// // Safety limit
-// pwmLeft = constrain(pwmLeft, 0, 180);
-// pwmRight = constrain(pwmRight, 0, 180);
+pwmLeft  = constrain(pwmLeft, 0, 180);
+pwmRight = constrain(pwmRight, 0, 180);
 
-// Apply
 esc1.write(pwmLeft);
 esc2.write(pwmRight);
+
 
   Serial.print("Left: ");
   Serial.print(pwmLeft);
