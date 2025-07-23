@@ -185,28 +185,39 @@ void setup() {
 void loop() {
   Blynk.run();
 
-  int pwmLeft, pwmRight;
-  float powerLimit = 0.3; // 30% of full power (change to anything from 0.0 to 1.0)
 
-  int offsetL = sliderValue - 2048;
-  // Map offset range (-512 to +511) to ESC signal range (0–180)
-  if (abs(offsetL) < 400) {
-    pwmLeft = neutralSignal; // Deadzone
-  } else {
-    int fullLRange = map(offsetL, -2048, 2048, -90, 90);
-    pwmLeft = neutralSignal + fullLRange * powerLimit;
-  }
 
-  int offsetR = joystick_steer_pos - 2048;
-  if (abs(offsetR) < 400) {
-    pwmRight = neutralSignal; // Deadzone
-  } else {
-    int fullRRange = map(offsetR, -2048, 2048, -90, 90);
-    pwmRight = neutralSignal + fullRRange * powerLimit;
-  }
+  
+  // int pwmLeft, pwmRight;
+  // float powerLimit = 0.3; // 30% of full power (change to anything from 0.0 to 1.0)
 
-  esc1.write(pwmLeft);
-  esc2.write(pwmRight);
+  // int offsetL = sliderValue - 2048;
+  // // Map offset range (-512 to +511) to ESC signal range (0–180)
+  // if (abs(offsetL) < 400) {
+  //   pwmLeft = neutralSignal; // Deadzone
+  // } else {
+  //   int fullLRange = map(offsetL, -2048, 2048, -90, 90);
+  //   pwmLeft = neutralSignal + fullLRange * powerLimit;
+  //   esc1.write(pwmLeft);
+  //   esc2.write(pwmLeft);
+  //   // I want to try to use one slider/potentiometer for forwar and backward drive and another for turning left and right
+  // }
+
+  // int offsetR = joystick_steer_pos - 2048;
+  // if (abs(offsetR) < 400) {
+  //   pwmRight = neutralSignal; // Deadzone
+  // } else {
+  //   int fullRRange = map(offsetR, -2048, 2048, -90, 90);
+  //   pwmRight = neutralSignal + fullRRange * powerLimit;
+  //   esc1.write(pwmRight);
+  //   esc2.write(-pwmRight);
+  // }
+
+//
+  // esc1.write(pwmLeft);
+  // esc2.write(pwmRight);
+
+
   // int motorF = 2000;
   // int motorB = 2000;
 
