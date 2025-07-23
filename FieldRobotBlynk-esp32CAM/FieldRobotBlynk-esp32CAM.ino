@@ -190,7 +190,7 @@ void loop() {
 
   int offsetL = sliderValue - 2048;
   // Map offset range (-512 to +511) to ESC signal range (0–180)
-  if (abs(offsetL) < 200) {
+  if (abs(offsetL) < 300) {
     pwmLeft = neutralSignal; // Deadzone
   } else {
     int fullLRange = map(offsetL, -2048, 2048, -90, 90);
@@ -198,7 +198,7 @@ void loop() {
   }
 
   int offsetR = joystick_steer_pos - 2048;
-  if (abs(offsetR) < 200) {
+  if (abs(offsetR) < 300) {
     pwmRight = neutralSignal; // Deadzone
   } else {
     int fullRRange = map(offsetR, -2048, 2048, -90, 90);
