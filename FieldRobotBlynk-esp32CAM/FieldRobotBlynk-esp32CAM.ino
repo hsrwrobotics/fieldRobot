@@ -186,20 +186,23 @@ void loop() {
   Blynk.run();
 
   int pwmLeft, pwmRight;
+  float powerLimit = 0.6; // 60% of full power (change to anything from 0.0 to 1.0)
 
   int offsetL = sliderValue - 2048;
   // Map offset range (-512 to +511) to ESC signal range (0–180)
   if (abs(offsetL) < 200) {
     pwmLeft = neutralSignal; // Deadzone
   } else {
-    pwmLeft = map(offsetL,-2048, 2048, 0, 180);
+    pwmLeft = map(offsetL,-2048, 2048, -90, 90);
+    pwmLeft = neutralSignal + fullRange * powerLimit;
   }
 
   int offsetR = joystick_steer_pos - 2048;
   if (abs(offsetR) < 200) {
     pwmRight = neutralSignal; // Deadzone
   } else {
-    pwmRight = map(offsetR,-2048, 2048, 0, 180);
+    pwmRight = map(offsetR,-2048, 2048, -90, 90);
+    pwmRight = neutralSignal + fullRange * powerLimit;
   }
 
   esc1.write(pwmLeft);
