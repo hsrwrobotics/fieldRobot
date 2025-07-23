@@ -59,8 +59,8 @@ void setup() {
   Serial.println();
   
 
-////////////////////////////////
-  camera_config_t config;
+////Camera stuff////////////////////////////
+camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
   config.ledc_timer = LEDC_TIMER_0;
   config.pin_d0 = Y2_GPIO_NUM;
@@ -103,52 +103,52 @@ void setup() {
   } else {
     // Best option for face detection/recognition
     config.frame_size = FRAMESIZE_240X240;
-#if CONFIG_IDF_TARGET_ESP32S3
-    config.fb_count = 2;
-#endif
-  }
+  #if CONFIG_IDF_TARGET_ESP32S3
+      config.fb_count = 2;
+  #endif
+    }
 
-#if defined(CAMERA_MODEL_ESP_EYE)
-  pinMode(13, INPUT_PULLUP);
-  pinMode(14, INPUT_PULLUP);
-#endif
+  #if defined(CAMERA_MODEL_ESP_EYE)
+    pinMode(13, INPUT_PULLUP);
+    pinMode(14, INPUT_PULLUP);
+  #endif
 
-  // camera init
-  esp_err_t err = esp_camera_init(&config);
-  if (err != ESP_OK) {
-    Serial.printf("Camera init failed with error 0x%x", err);
-    return;
-  }
+    // camera init
+    esp_err_t err = esp_camera_init(&config);
+    if (err != ESP_OK) {
+      Serial.printf("Camera init failed with error 0x%x", err);
+      return;
+    }
 
-  sensor_t *s = esp_camera_sensor_get();
-  s->set_hmirror(s, 1);
-  s->set_vflip(s, 1);
+    sensor_t *s = esp_camera_sensor_get();
+    s->set_hmirror(s, 1);
+    s->set_vflip(s, 1);
 
-  // initial sensors are flipped vertically and colors are a bit saturated
-  if (s->id.PID == OV3660_PID) {
-    s->set_vflip(s, 1);        // flip it back
-    s->set_brightness(s, 1);   // up the brightness just a bit
-    s->set_saturation(s, -2);  // lower the saturation
-  }
-  // drop down frame size for higher initial frame rate
-  if (config.pixel_format == PIXFORMAT_JPEG) {
-    s->set_framesize(s, FRAMESIZE_SVGA);
-  }
+    // initial sensors are flipped vertically and colors are a bit saturated
+    if (s->id.PID == OV3660_PID) {
+      s->set_vflip(s, 1);        // flip it back
+      s->set_brightness(s, 1);   // up the brightness just a bit
+      s->set_saturation(s, -2);  // lower the saturation
+    }
+    // drop down frame size for higher initial frame rate
+    if (config.pixel_format == PIXFORMAT_JPEG) {
+      s->set_framesize(s, FRAMESIZE_SVGA);
+    }
 
-#if defined(CAMERA_MODEL_M5STACK_WIDE) || defined(CAMERA_MODEL_M5STACK_ESP32CAM)
-  s->set_vflip(s, 1);
-  s->set_hmirror(s, 1);
-#endif
+  #if defined(CAMERA_MODEL_M5STACK_WIDE) || defined(CAMERA_MODEL_M5STACK_ESP32CAM)
+    s->set_vflip(s, 1);
+    s->set_hmirror(s, 1);
+  #endif
 
-#if defined(CAMERA_MODEL_ESP32S3_EYE)
-  s->set_vflip(s, 1);
-#endif
+  #if defined(CAMERA_MODEL_ESP32S3_EYE)
+    s->set_vflip(s, 1);
+  #endif
 
-// Setup LED FLash if LED pin is defined in camera_pins.h
-#if defined(LED_GPIO_NUM)
-  setupLedFlash(LED_GPIO_NUM);
-#endif
-
+  // Setup LED FLash if LED pin is defined in camera_pins.h
+  #if defined(LED_GPIO_NUM)
+    setupLedFlash(LED_GPIO_NUM);
+  #endif
+///wifi setup
   WiFi.begin(ssid, password);
   WiFi.setSleep(false);
 
@@ -175,6 +175,9 @@ void setup() {
   setupMotors();
   calibrateMotors();
 
+  
+
+
   Serial.println("Code is ready. The video stream is located in the URL: ");
   String u = "http://"+WiFi.localIP().toString()+":81/stream";//goes directly into video feed, not the camsera server UI
   Serial.print(u);
@@ -185,35 +188,39 @@ void setup() {
 void loop() {
   Blynk.run();
 
-
-
-  int pwmLeft, pwmRight;
 float powerLimit = 0.3;
 
-int offsetThrottle = sliderValue - 2048;  // forward/backward
-int offsetSteering = joystick_steer_pos - 2048;  // left/right
+int offsetThrottle = sliderValue - 2048;
+int offsetSteering = joystick_steer_pos - 2048;
 
-int throttle = 0;
-int steer = 0;
+// Normalize throttle and steer to a range of -90 to 90
+int throttleCmd = 0;
+int steerCmd = 0;
 
 if (abs(offsetThrottle) >= 400) {
-  throttle = map(offsetThrottle, -2048, 2048, -90, 90) * powerLimit;
+  throttleCmd = map(offsetThrottle, -2048, 2048, -90, 90);
 }
 
 if (abs(offsetSteering) >= 400) {
-  steer = map(offsetSteering, -2048, 2048, -90, 90) * powerLimit;
+  steerCmd = map(offsetSteering, -2048, 2048, -90, 90);
 }
 
-// Combine throttle and steer to get left/right ESC signals
-pwmLeft  = neutralSignal + throttle + steer;
-pwmRight = neutralSignal + throttle - steer;
+// Apply power limit
+float pwmLeft = neutralSignal + (throttleCmd + steerCmd) * powerLimit;
+float pwmRight = neutralSignal + (throttleCmd - steerCmd) * powerLimit;
 
-// Clamp output to [0, 180] for safety
-pwmLeft  = constrain(pwmLeft, 0, 180);
+// Safety limit
+pwmLeft = constrain(pwmLeft, 0, 180);
 pwmRight = constrain(pwmRight, 0, 180);
 
+// Apply
 esc1.write(pwmLeft);
 esc2.write(pwmRight);
+
+  Serial.print("Left: ");
+  Serial.print(pwmLeft);
+  Serial.print("||   Right: ");
+  Serial.println(pwmRight);
 
   // int pwmLeft, pwmRight;
   // float powerLimit = 0.3; // 30% of full power (change to anything from 0.0 to 1.0)
