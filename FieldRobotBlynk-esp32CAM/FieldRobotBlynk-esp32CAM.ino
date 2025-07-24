@@ -188,12 +188,12 @@ camera_config_t config;
 void loop() {
 Blynk.run();
 
-float powerLimit = 0.3;
 int offsetThrottle = sliderValue - 2048;
 int offsetSteering = joystick_steer_pos - 2048;
 
 int throttleCmd = 0;
 int steerCmd = 0;
+float powerLimit = 0.2;
 
 if (abs(offsetThrottle) > 400) {
   throttleCmd = map(offsetThrottle, -2048, 2048, -90, 90);
@@ -202,8 +202,8 @@ if (abs(offsetSteering) > 400) {
   steerCmd = map(offsetSteering, -2048, 2048, -90, 90);
 }
 
-float pwmLeft  = neutralSignal + (float)(throttleCmd + steerCmd) * powerLimit;
-float pwmRight = neutralSignal + (float)(throttleCmd - steerCmd) * powerLimit;
+float pwmLeft  = neutralSignal + (throttleCmd + steerCmd) * powerLimit;
+float pwmRight = neutralSignal + (throttleCmd - steerCmd) * powerLimit;
 
 pwmLeft  = constrain(pwmLeft, 0, 180);
 pwmRight = constrain(pwmRight, 0, 180);
@@ -211,8 +211,12 @@ pwmRight = constrain(pwmRight, 0, 180);
 esc1.write(pwmLeft);
 esc2.write(pwmRight);
 
+  Serial.print("neutralSignal: "); Serial.print(neutralSignal);
+  Serial.print("  throttleCmd: "); Serial.print(throttleCmd);
+  Serial.print("  steerCmd: "); Serial.print(steerCmd);
+  Serial.print("  powerLimit: "); Serial.print(powerLimit);
 
-  Serial.print("Left: ");
+  Serial.print("||  Left: ");
   Serial.print(pwmLeft);
   Serial.print("||   Right: ");
   Serial.println(pwmRight);
