@@ -7,6 +7,7 @@
 
 #include <WiFi.h>
 #include <WiFiClient.h>
+
 #include <BlynkSimpleEsp32.h>
 #include "esp_camera.h"
 #include "esp_http_server.h"

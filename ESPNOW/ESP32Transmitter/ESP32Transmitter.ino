@@ -2,7 +2,7 @@
 #include <WiFi.h>
 
 // REPLACE WITH YOUR RECEIVER MAC Address
-uint8_t receiverAddress[] = {0x08, 0x3a, 0x8d, 0x90, 0x25, 0x8c};
+uint8_t receiverAddress[] = {0x08, 0xf9, 0xe0, 0xd3, 0xd7, 0xe4};
 
 // Structure example to send data
 typedef struct struct_message {
@@ -21,7 +21,7 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
 }
 
-#define JoyStick_X_PIN 35
+#define JoyStick_X_PIN 36
 #define JoyStick_Y_PIN 33
 
 int valueX = 0; // to store the X-axis value
@@ -61,6 +61,7 @@ void setup() {
 void loop() {
   // Set values to send
   int valueX = analogRead(JoyStick_X_PIN); // to store the X-axis value
+  delayMicroseconds(300);  // Let ADC stabilize
   int valueY = analogRead(JoyStick_Y_PIN); // to store the Y-axis value
 
   myData.x = valueX;
@@ -80,4 +81,4 @@ void loop() {
   //   Serial.println("Error sending the data");
   // }
   delay(10);
-}
+}// i found that using 5v to power both joysticks causes issues. but using 3v3 fixed them.
