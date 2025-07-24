@@ -204,14 +204,14 @@ void loop() {
 
   int throttleCmd = 0;
   int steerCmd = 0;
-  float powerLimit = 0.3;
+  float powerLimit = 0.1;
 
-  if (abs(offsetThrottle) > 600) {
+  if (abs(offsetThrottle) > 400) {
     throttleCmd = map(offsetThrottle, -2048, 2048, -90, 90);
     delay(10);
   }
-  if (abs(offsetSteering) > 600) {
-    steerCmd = map(offsetSteering, -2048, 2048, -90, 90);
+  if (abs(offsetSteering) > 400) {
+    steerCmd = map(offsetSteering, 2048, -2048, -90, 90);
     delay(10);
   }
 
