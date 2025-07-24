@@ -67,9 +67,9 @@ void loop() {
   myData.x = valueX;
   myData.y = valueY;
 
-  Serial.print(myData.x);
-  Serial.print(" | ");
   Serial.print(myData.y);
+  Serial.print(" | ");
+  Serial.print(myData.x);
   Serial.println();
 
   // Send message via ESP-NOW
@@ -80,5 +80,5 @@ void loop() {
   // } else {
   //   Serial.println("Error sending the data");
   // }
-  delay(10);
+  delay(5);
 }// i found that using 5v to power both joysticks causes issues. but using 3v3 fixed them.
