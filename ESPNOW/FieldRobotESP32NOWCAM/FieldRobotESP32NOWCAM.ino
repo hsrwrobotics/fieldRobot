@@ -204,7 +204,7 @@ void loop() {
 
   int throttleCmd = 0;
   int steerCmd = 0;
-  float powerLimit = 0.1;
+  float powerLimit = 0.15;
 
   if (abs(offsetThrottle) > 400) {
     throttleCmd = map(offsetThrottle, -2048, 2048, -90, 90);
