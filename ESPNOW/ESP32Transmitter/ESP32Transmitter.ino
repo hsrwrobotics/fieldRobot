@@ -2,8 +2,8 @@
 #include <WiFi.h>
 
 // REPLACE WITH YOUR RECEIVER MAC Address
-uint8_t receiverAddress[] = {0x08, 0xf9, 0xe0, 0xd3, 0xd7, 0xe4};
-
+uint8_t receiverAddress[] = {0xc8, 0x2e, 0x18, 0x45, 0xd7, 0x04};
+// uint8_t receiverAddress[] = {0x08, 0xf9, 0xe0, 0xd3, 0xd7, 0xe4};
 // Structure example to send data
 typedef struct struct_message {
   int x;
